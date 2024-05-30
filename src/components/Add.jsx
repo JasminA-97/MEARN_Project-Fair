@@ -38,7 +38,7 @@ const Add = () => {
           </div>
 
           <div>
-          <input type="text" className='form-control' placeholder='Project Review'/>
+          <input type="text" className='form-control' placeholder='Project Overview'/>
           </div>
 
         </Modal.Body>
