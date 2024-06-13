@@ -16,7 +16,12 @@ const Home = () => {
                             <i className="fa-brands fa-docker">Project-Fair</i>
                         </h6>
                         <p style={{textAlign:'justify'}}>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Aut ad rem deserunt sit qui exercitationem ab consequuntur. Eveniet expedita tenetur, assumenda, libero harum optio dolorum non necessitatibus aspernatur quisquam ipsum?</p>
-                        <Link to={'/login'} className='btn btn-warning'>START TO EXPLORE</Link>
+                        {
+                            sessionStorage.getItem("token")?
+                            <Link to={'/dashboard'} className='btn btn-warning'>MANAGE YOUR PROJECTS</Link>
+                            :
+                            <Link to={'/login'} className='btn btn-warning'>START TO EXPLORE</Link>
+                        }
                     </div>
                     <div className="col-lg-6">
                         <img src={landing} alt="langing" className="img-fluid" />

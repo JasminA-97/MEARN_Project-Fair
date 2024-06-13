@@ -1,8 +1,78 @@
-import React from 'react'
-import { FloatingLabel, Form } from 'react-bootstrap'
+import React, { useState } from 'react'
+import { FloatingLabel, Form, Spinner } from 'react-bootstrap'
 import loginImg from '../assets/login.jpg'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { loginAPI, registerAPI } from '../services/allAPI'
+import { toast } from 'react-toastify'
+
 const Auth = ({insideRegister}) => {
+  
+  const [isLoggedin,setIsLoggedin] = useState(false)
+  const navigate = useNavigate()
+
+  const [userData,setUserData] = useState({username:"",email:"",password:""});
+  console.log(userData);
+
+  //register
+  const handleRegister = async (e)=>{
+    e.preventDefault()
+    if(userData.username && userData.email && userData.password){
+      //api call
+      try{
+        const result = await registerAPI(userData)
+        console.log(result);
+        if(result.status==200){
+          toast.warning(`Welcome ${result?.data?.username}...please login to explore more!!!`)
+          setUserData({username:"",email:"",password:""});
+          navigate('/login')
+        }else{
+          if(result.response.status==406){
+            toast.error(result.response.data)
+            setUserData({username:"",email:"",password:""});
+          }
+        }
+
+      }catch(err){
+        console.log(err);
+      }
+    }else{
+      toast.info('Please fill the form completely!!!')
+    }
+  }
+
+  //login
+  const handleLogin = async (e)=>{
+    e.preventDefault()
+    if(userData.email && userData.password){
+      //api call
+      try{
+        const result = await loginAPI(userData)
+        console.log(result);
+        if(result.status == 200){
+          setIsLoggedin(true) //------------------------------------------spinner
+          sessionStorage.setItem("user",JSON.stringify(result.data.user))
+          sessionStorage.setItem("token",result.data.token)
+              
+          setTimeout(()=>{
+            //toast.warning(`Welcome ${result.data.user.username}...`) 
+            setUserData({username:"",email:"",password:""})
+            setIsLoggedin(false) //---------------------------------------spinner
+            navigate('/')
+          },2000);
+        }else{
+          if(result.response.status==404){
+            toast.error(result.response.data)
+          }
+        }
+      }catch(err){
+        console.log(err);
+      }
+    }else{
+      toast.info('Please fill the form completely')
+    }
+
+  }
+
   return (
     <div style={{width:'100%',height:'100vh'}} className='d-flex justify-content-center align-items-center'>
       <div className="container w-75">
@@ -20,26 +90,31 @@ const Auth = ({insideRegister}) => {
               {
                 insideRegister &&
                 <FloatingLabel controlId="floatingInputname" label="Username" className="mb-3" >
-                  <Form.Control type="email" placeholder="Username" />
+                  <Form.Control type="text" placeholder="Username" value={userData.username} onChange={e=>setUserData({...userData,username:e.target.value})} />
                 </FloatingLabel>
               }
                 <FloatingLabel controlId="floatingInput"label="Email address"className="mb-3">
-                    <Form.Control type="email" placeholder="name@example.com" />
+                    <Form.Control type="email" placeholder="name@example.com" value={userData.email} onChange={e=>setUserData({...userData,email:e.target.value})}/>
                 </FloatingLabel>
 
                 <FloatingLabel controlId="floatingPassword" label="Password">
-                 <Form.Control type="password" placeholder="Password" />
+                 <Form.Control type="password" placeholder="Password" value={userData.password} onChange={e=>setUserData({...userData,password:e.target.value})}/>
                 </FloatingLabel>
 
                 {
                   insideRegister?
                   <div className="mt-3">
-                    <button className="btn btn-primary mb-2">Register</button>
+                    <button onClick={handleRegister} className="btn btn-primary mb-2">Register</button>
                     <p>Already Have an Account? Click here to <Link to={'/login'}>Login</Link></p>
                   </div>
                   :
                   <div className="mt-3">
-                    <button className="btn btn-primary mb-2">Login</button>
+                    <button onClick={handleLogin} className="btn btn-primary mb-2">Login
+                        {//---------------------------------------spinner
+                          isLoggedin&&
+                          <Spinner animation="border" variant="light" />
+                        }
+                     </button>
                     <p>New User? Click here to <Link to={'/register'}>Register</Link> </p>
                   </div>
                 }
