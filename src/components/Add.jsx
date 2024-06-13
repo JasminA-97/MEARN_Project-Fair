@@ -9,7 +9,7 @@ const Add = () => {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
+  console.log(imageFileStatus);
   console.log(projectDetails);
 
   useEffect(()=>{
@@ -36,6 +36,7 @@ const Add = () => {
                 <img height={'200px'} className='img-fluid' src={preview} alt="" />
               </label>
               {
+                !imageFileStatus&&
                 <div className="text-warning fw-bolder my-2">*Upload only the following file types (jpeg/jpg/png)here!!!</div>
               }
             </div>
