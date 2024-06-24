@@ -1,11 +1,40 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import landing from '../assets/admin.png'
 import ProjectCard from '../components/ProjectCard'
 import { Card } from 'react-bootstrap'
+import { toast } from 'react-toastify'
+import { homeProjectAPI } from '../services/allAPI'
 
 
 const Home = () => {
+    const [homeProjects,setHomeProjects] = useState([])
+    const navigate = useNavigate()
+    // console.log(homeProjects);
+
+    useEffect(()=>{
+        getHomeProjects()
+    },[])
+
+    const getHomeProjects = async()=>{
+        try{
+            const result = await homeProjectAPI()
+            // console.log(result);
+            if(result.status == 200){
+                setHomeProjects(result.data) 
+            }
+        }catch(err){
+            // console.log(err);
+        }
+    }
+
+    const handleProject = ()=>{
+        if(sessionStorage.getItem("token")){
+           navigate('/projects')
+        }else{
+            toast.warning("Please login top get full access to our projects!!!")
+        }
+    }
   return (
     <>
         <div style={{minHeight:'100vh'}} className="d-flex justify-center align-items-center rounded shadow w-100">
@@ -34,12 +63,18 @@ const Home = () => {
             <h1 className="mb-5">explore our projects</h1>
             <marquee>
                 <div className="d-flex">
-                    <div className="me-5">
-                        <ProjectCard/>
-                    </div>
+
+                    {
+                        homeProjects?.length>0 &&
+                        homeProjects?.map(project=>(
+                            <div key={project?._id} className="me-5">
+                                <ProjectCard displayData={project}/>
+                            </div>
+                        ))
+                    }
                 </div>
             </marquee>
-            <button className="btn btn-link mt-5">click here to view more projects</button>
+            <button onClick={handleProject} className="btn btn-link mt-5">click here to view more projects</button>
         </div>
 
         <div className="d-flex align-items-center mt-5 flex-column">

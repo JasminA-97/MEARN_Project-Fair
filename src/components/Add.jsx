@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Button, Modal } from 'react-bootstrap'
 import addImg from '../assets/AddImg.png'
 import { toast } from 'react-toastify'
 import { addProjectAPI } from '../services/allAPI'
+import { addResponsecontext } from '../context/ContextAPI';
 
 
 const Add = () => {
+  const {addResponse, setAddResponse} = useContext(addResponsecontext);
   const [preview,setPreview] = useState(addImg)
   const [imageFileStatus,setimageFileStatus]=useState(false)
   const [projectDetails,setProjectDetails] = useState({title:"",language:"",github:"",website:"",overview:"",projectImg:""})
@@ -34,7 +36,7 @@ const Add = () => {
   const handleAddProject = async()=>{
     const {title,language,github,website,overview,projectImg} = projectDetails
     if(projectDetails.title && projectDetails.language && projectDetails.github && projectDetails.website && projectDetails.overview && projectDetails.projectImg){
-      //api call - reqbody,reqheader
+    
       //reqbody - add items to formdata
       const reqBody = new FormData()
       reqBody.append("title",title)
@@ -55,10 +57,10 @@ const Add = () => {
         const result = await addProjectAPI(reqBody,reqHeader)
         console.log(result);
         if(result.status==200){
-          handleClose()
-          toast.success('Project added successfully')
+          handleClose();
+          setAddResponse(result);
         }else{
-          toast.warning(result.response.data)
+          toast.warning(result.response.data);
         }
        }catch(err){
         console.log(err);

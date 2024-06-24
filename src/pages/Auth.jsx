@@ -1,17 +1,20 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { FloatingLabel, Form, Spinner } from 'react-bootstrap'
 import loginImg from '../assets/login.jpg'
 import { Link, useNavigate } from 'react-router-dom'
 import { loginAPI, registerAPI } from '../services/allAPI'
 import { toast } from 'react-toastify'
+import { tokenAuthContext } from '../context/AuthContext'
 
 const Auth = ({insideRegister}) => {
+
+  const {isAuthorised,setIsAuthorised} = useContext(tokenAuthContext)
   
   const [isLoggedin,setIsLoggedin] = useState(false)
   const navigate = useNavigate()
 
   const [userData,setUserData] = useState({username:"",email:"",password:""});
-  console.log(userData);
+  // console.log(userData);
 
   //register
   const handleRegister = async (e)=>{
@@ -52,6 +55,7 @@ const Auth = ({insideRegister}) => {
           setIsLoggedin(true) //------------------------------------------spinner
           sessionStorage.setItem("user",JSON.stringify(result.data.user))
           sessionStorage.setItem("token",result.data.token)
+          setIsAuthorised(true)
               
           setTimeout(()=>{
             //toast.warning(`Welcome ${result.data.user.username}...`) 
